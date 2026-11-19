@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/api/eventos/1"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \  \"nome\": \"Workshop de Tecnologia - Atualizado\",\r
+
+    \  \"descricao\": \"Evento atualizado durante os testes da API EventHub\",\r
+
+    \  \"dataHora\": \"2026-12-15T14:00:00\",\r
+
+    \  \"local\": \"UFMS - Campo Grande\",\r
+
+    \  \"capacidade\": 150,\r
+
+    \  \"status\": \"ABERTO\"\r
+
+    }"
+order: 4000
