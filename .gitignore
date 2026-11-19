@@ -1,0 +1,9 @@
+# Variáveis de ambiente e credenciais
+.env
+.env.*
+
+# Exceção para arquivos de exemplo
+!.env.example
+
+# IntelliJ IDEA
+.idea/
