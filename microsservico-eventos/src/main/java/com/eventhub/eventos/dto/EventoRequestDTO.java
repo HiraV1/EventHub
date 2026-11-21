@@ -1,6 +1,5 @@
 package com.eventhub.eventos.dto;
 
-import com.eventhub.eventos.model.StatusEvento;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,9 +26,6 @@ public class EventoRequestDTO {
     @Min(value = 1, message = "A capacidade deve ser de pelo menos 1 participante.")
     private Integer capacidade;
 
-    @NotNull(message = "O status do evento é obrigatório.")
-    private StatusEvento status;
-
     public String getNome() {
         return nome;
     }
@@ -48,9 +44,5 @@ public class EventoRequestDTO {
 
     public Integer getCapacidade() {
         return capacidade;
-    }
-
-    public StatusEvento getStatus() {
-        return status;
     }
 }

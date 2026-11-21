@@ -4,6 +4,7 @@ import com.eventhub.eventos.dto.EventoRequestDTO;
 import com.eventhub.eventos.dto.EventoResponseDTO;
 import com.eventhub.eventos.exception.EventoNotFoundException;
 import com.eventhub.eventos.model.Evento;
+import com.eventhub.eventos.model.StatusEvento;
 import com.eventhub.eventos.repository.EventoRepository;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class EventoService {
                 dados.getDataHora(),
                 dados.getLocal(),
                 dados.getCapacidade(),
-                dados.getStatus()
+                StatusEvento.ABERTO
         );
 
         Evento eventoSalvo = eventoRepository.save(evento);
@@ -43,7 +44,7 @@ public class EventoService {
     }
 
     public List<EventoResponseDTO> listarEventos() {
-        return eventoRepository.findAll()
+        return eventoRepository.findByStatusNot(StatusEvento.EXCLUIDO)
                 .stream()
                 .map(this::converterParaResponseDTO)
                 .toList();
@@ -65,6 +66,12 @@ public class EventoService {
     public EventoResponseDTO atualizarEvento(Long id, EventoRequestDTO dados) {
         Evento eventoExistente = buscarEntidadePorId(id);
 
+        if(eventoExistente.getStatus() == StatusEvento.EXCLUIDO) {
+            throw new IllegalArgumentException(
+                    "Não é possível atualizar um evento excluído."
+            );
+        }
+
         validarCapacidade(dados.getCapacidade());
 
         eventoExistente.setNome(dados.getNome());
@@ -72,7 +79,6 @@ public class EventoService {
         eventoExistente.setDataHora(dados.getDataHora());
         eventoExistente.setLocal(dados.getLocal());
         eventoExistente.setCapacidade(dados.getCapacidade());
-        eventoExistente.setStatus(dados.getStatus());
 
         Evento eventoAtualizado =  eventoRepository.save(eventoExistente);
 
@@ -82,7 +88,43 @@ public class EventoService {
     public void excluirEvento(Long id) {
         Evento evento = buscarEntidadePorId(id);
 
-        eventoRepository.delete(evento);
+        if(evento.getStatus() != StatusEvento.ABERTO) {
+            throw new IllegalArgumentException(
+                    "Somente eventos abertos podem ser excluídos."
+            );
+        }
+
+        evento.setStatus(StatusEvento.EXCLUIDO);
+
+        eventoRepository.save(evento);
+    }
+
+    public void encerrarEvento(Long id) {
+        Evento evento = buscarEntidadePorId(id);
+
+        if(evento.getStatus() != StatusEvento.ABERTO) {
+            throw new IllegalArgumentException(
+                    "Somente eventos abertos podem ser encerrados."
+            );
+        }
+
+        evento.setStatus(StatusEvento.ENCERRADO);
+
+        eventoRepository.save(evento);
+    }
+
+    public void cancelarEvento(Long id) {
+        Evento evento = buscarEntidadePorId(id);
+
+        if(evento.getStatus() != StatusEvento.ABERTO) {
+            throw new IllegalArgumentException(
+                    "Somente eventos aberto podem ser cancelados."
+            );
+        }
+
+        evento.setStatus(StatusEvento.CANCELADO);
+
+        eventoRepository.save(evento);
     }
 
     private EventoResponseDTO converterParaResponseDTO(Evento evento) {
