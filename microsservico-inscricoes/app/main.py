@@ -8,15 +8,33 @@ from app.clients.evento_client import EventoClient
 
 from prometheus_fastapi_instrumentator import Instrumentator
 
+from contextlib import asynccontextmanager
+from app.messaging.evento_consumer import EventoConsumer
+
+repositorio = InscricaoRepository()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    consumidor = EventoConsumer(repositorio)
+
+    await consumidor.iniciar()
+
+    app.state.evento_consumer = consumidor
+
+    try:
+        yield
+    finally:
+        await consumidor.parar()
+
 app = FastAPI(
     title="EventHub - Microsserviço de Inscrições",
     description="API responsável pelo gerenciamento de inscrições em eventos.",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 
 # Inicialização do Repository e Service
-repositorio = InscricaoRepository()
 evento_client = EventoClient()
 
 app.state.inscricao_service = InscricaoService(

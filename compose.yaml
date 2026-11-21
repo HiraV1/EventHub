@@ -44,10 +44,16 @@ services:
       DB_URL: jdbc:postgresql://db_eventos:5432/${EVENTOS_DB_NAME}
       DB_USERNAME: ${EVENTOS_DB_USER}
       DB_PASSWORD: ${EVENTOS_DB_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     ports:
       - "8080:8080"
     depends_on:
       db_eventos:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   inscricoes:
@@ -62,6 +68,10 @@ services:
       INSCRICOES_DB_USER: ${INSCRICOES_DB_USER}
       INSCRICOES_DB_PASSWORD: ${INSCRICOES_DB_PASSWORD}
       EVENTOS_API_URL: http://eventos:8080
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     ports:
       - "8000:8000"
     depends_on:
@@ -69,6 +79,8 @@ services:
         condition: service_healthy
       eventos:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   nginx:
     image: nginx:alpine
@@ -109,8 +121,27 @@ services:
     depends_on:
       - prometheus
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: eventhub-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_eventos_data:
   postgres_inscricoes_data:
   prometheus_data:
   grafana_data:
+  rabbitmq_data:

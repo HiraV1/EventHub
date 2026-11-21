@@ -13,9 +13,7 @@ body:
 
     \  \"local\": \"UFMS - Campo Grande\",\r
 
-    \  \"capacidade\": 150,\r
-
-    \  \"status\": \"ABERTO\"\r
+    \  \"capacidade\": 150\r
 
     }"
 order: 4000

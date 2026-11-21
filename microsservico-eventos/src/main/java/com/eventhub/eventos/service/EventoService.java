@@ -3,9 +3,11 @@ package com.eventhub.eventos.service;
 import com.eventhub.eventos.dto.EventoRequestDTO;
 import com.eventhub.eventos.dto.EventoResponseDTO;
 import com.eventhub.eventos.exception.EventoNotFoundException;
+import com.eventhub.eventos.messaging.EventoStatusEvent;
 import com.eventhub.eventos.model.Evento;
 import com.eventhub.eventos.model.StatusEvento;
 import com.eventhub.eventos.repository.EventoRepository;
+import com.eventhub.eventos.messaging.EventoProducer;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +15,14 @@ import java.util.List;
 @Service
 public class EventoService {
     private final EventoRepository eventoRepository;
+    private final EventoProducer eventoProducer;
 
-    public EventoService(EventoRepository eventoRepository) {
+    public EventoService(
+            EventoRepository eventoRepository,
+            EventoProducer eventoProducer
+    ) {
         this.eventoRepository = eventoRepository;
+        this.eventoProducer = eventoProducer;
     }
 
     private void validarCapacidade(Integer capacidade) {
@@ -96,7 +103,12 @@ public class EventoService {
 
         evento.setStatus(StatusEvento.EXCLUIDO);
 
-        eventoRepository.save(evento);
+        Evento eventoSalvo = eventoRepository.save(evento);
+
+        eventoProducer.publicarEventoStatus(
+                eventoSalvo.getId(),
+                EventoStatusEvent.EVENTO_EXCLUIDO
+        );
     }
 
     public void encerrarEvento(Long id) {
@@ -118,13 +130,18 @@ public class EventoService {
 
         if(evento.getStatus() != StatusEvento.ABERTO) {
             throw new IllegalArgumentException(
-                    "Somente eventos aberto podem ser cancelados."
+                    "Somente eventos abertos podem ser cancelados."
             );
         }
 
         evento.setStatus(StatusEvento.CANCELADO);
 
-        eventoRepository.save(evento);
+        Evento eventoSalvo = eventoRepository.save(evento);
+
+        eventoProducer.publicarEventoStatus(
+                eventoSalvo.getId(),
+                EventoStatusEvent.EVENTO_CANCELADO
+        );
     }
 
     private EventoResponseDTO converterParaResponseDTO(Evento evento) {
