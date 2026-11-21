@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{base_url}}/api/eventos/1/cancelar"
+method: PATCH
+order: 6000

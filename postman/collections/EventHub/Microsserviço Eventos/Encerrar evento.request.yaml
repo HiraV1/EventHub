@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{base_url}}/api/eventos/1/encerrar"
+method: PATCH
+order: 7000
