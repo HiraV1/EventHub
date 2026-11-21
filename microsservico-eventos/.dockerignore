@@ -1,0 +1,13 @@
+# Arquivos gerados pelo Maven
+target/
+
+# Configurações da IDE
+.idea/
+*.iml
+
+# Controle de versão
+.git/
+.gitignore
+
+# Arquivos auxiliares
+HELP.md

@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/api/inscricoes"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"evento_id\": 2,\r
+
+    \  \"participante_nome\": \"Teste Teste\",\r
+
+    \  \"participante_email\": \"Teste123@email.com\"\r
+
+    }"
+order: 2000
