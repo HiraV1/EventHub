@@ -85,7 +85,7 @@ Para executar o projeto, é necessário ter instalado:
 ### 1. Clonar o repositório
 
 ```bash
-git clone [URL_DO_REPOSITORIO](https://github.com/HiraV1/EventHub)
+git clone https://github.com/HiraV1/EventHub
 ```
 
 Entre na pasta do projeto:
@@ -172,5 +172,6 @@ O EventHub utiliza Prometheus para coletar métricas dos microsserviços e Grafa
 
 ## Autores
 
-Higor Morais Vieira
+Autor: Higor Morais Vieira
+
 Projeto acadêmico desenvolvido para a disciplina de Sistemas Distribuídos.
