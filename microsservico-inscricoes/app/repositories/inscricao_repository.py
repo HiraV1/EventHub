@@ -1,7 +1,6 @@
-
 from app.database.conexao import SessionLocal
 from app.models.inscricao import Inscricao
-
+from app.models.status_inscricao import StatusInscricao
 
 class InscricaoRepository:
 
@@ -41,3 +40,25 @@ class InscricaoRepository:
             db.commit()
 
             return True
+
+    def cancelar_por_evento(self, evento_id: int) -> int:
+        with SessionLocal() as db:
+            try:
+                quantidade = (
+                    db.query(Inscricao)
+                    .filter(Inscricao.evento_id == evento_id)
+                    .update(
+                        {
+                            Inscricao.status: StatusInscricao.CANCELADA
+                        },
+                        synchronize_session=False
+                    )
+                )
+
+                db.commit()
+
+                return quantidade
+
+            except Exception:
+                db.rollback()
+                raise
